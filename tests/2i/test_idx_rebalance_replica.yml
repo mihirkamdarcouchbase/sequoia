@@ -4,13 +4,13 @@
 ############### data loading ################
 -
   image: sequoiatools/gideon
-  command: "kv --ops {{.Scale 10000}} --create 30 --get 70 --delete 10     --hosts {{.Orchestrator}} --bucket {{.Bucket}}"
+  command: "kv --ops {{.Scale 1000}} --create 30 --get 70 --delete 10     --hosts {{.Orchestrator}} --bucket {{.Bucket}}"
 -
-  command: "kv --ops {{.Scale 5000}} --create 60 --get 40 --sizes 64 96   --hosts {{.Orchestrator}} --bucket {{.NthBucket 1}}"
+  command: "kv --ops {{.Scale 500}} --create 60 --get 40 --sizes 64 96   --hosts {{.Orchestrator}} --bucket {{.NthBucket 1}}"
 -
-  command: "kv --ops {{.Scale 5000}} --create 60 --get 40 --sizes 64 96   --hosts {{.Orchestrator}} --bucket {{.NthBucket 2}}"
+  command: "kv --ops {{.Scale 500}} --create 60 --get 40 --sizes 64 96   --hosts {{.Orchestrator}} --bucket {{.NthBucket 2}}"
 -
-  command: "kv --ops {{.Scale 2000}} --create 100 --sizes 1024  --hosts {{.Orchestrator}} --bucket {{.NthBucket 3}}"
+  command: "kv --ops {{.Scale 200}} --create 100 --sizes 1024  --hosts {{.Orchestrator}} --bucket {{.NthBucket 3}}"
 
 
 ###############  create indexes ################
@@ -53,28 +53,28 @@
 ############### run queries ################
 -
   template: attack_query
-  args: 0, 10, {{$.QueryNodePort}},
+  args: 60, 10, {{$.QueryNodePort}},
         select SUM(rating) from default where rating > 0 limit 50
   duration: 60
 -
   # load data
   template: attack_query
-  args: 0, 10, {{$.QueryNodePort}},
+  args: 60, 10, {{$.QueryNodePort}},
          select SUM(rating) from `other-1` where rating > 100  limit 50
   duration: 60
 -
   template: attack_query
-  args: 0, 10, {{$.QueryNodePort}},
+  args: 60, 10, {{$.QueryNodePort}},
         select SUM(rating) from `other-2` where result = SUCCESS limit 50
   duration: 60
 -
   template: attack_query
-  args: 0, 10, {{$.QueryNodePort}},
+  args: 60, 10, {{$.QueryNodePort}},
         select SUM(rating) from `other-3` where claim like A% limit 20
   duration: 60
 -
   template: attack_query
-  args: 0, 10, {{$.QueryNodePort}},
+  args: 60, 10, {{$.QueryNodePort}},
         select SUM(rating) from `other-3` where claim like A% limit 20
   duration: 60
 
@@ -117,7 +117,7 @@
    image: sequoiatools/couchbase-cli
    command: "server-add -c  {{.Orchestrator}}:{{.RestPort}}
        --server-add  {{.Nodes | net 7}}:{{.RestPort}}
-       --services index,data
+       --services index
        -u  {{.RestUsername}} -p  {{.RestPassword}}
        --server-add-username {{.RestUsername}} --server-add-password  {{.RestPassword}}"
    wait: true
