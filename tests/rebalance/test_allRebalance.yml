@@ -18,14 +18,21 @@
   args: "{{.NthDataNode 2}}"
   wait: true
 -
+  # Full recovery and add back Node 1
+  template: recover_node
+  args: "{{.NthDataNode 1}}, full"
+-
+  # Full recovery and add back Node 2
+  template: recover_node
+  args: "{{.NthDataNode 2}}, full"
+-
   template: rebalance
   wait: true
 -
-  template: group_add_servers
-  args: "kvgroup1, data, ({{.NthDataNode 1}}, {{.NthDataNode 2}})"
--
-  template: rebalance
-  wait: true
+  #template: group_add_servers
+  #args: "kvgroup1, data, ({{.NthDataNode 1}}, {{.NthDataNode 2}})"
+  template: group_move_servers
+  args: "\"Group 1\",kvgroup1,({{.NthDataNode 1}}, {{.NthDataNode 2}})"
 -
   # failover with delta recovery
   template: failover_and_recover
@@ -50,8 +57,10 @@
   duration: 60
 -
   # add back to group
-  template: group_add_servers
-  args: "kvgroup1, data, {{.NthDataNode 2}}"
+  #template: group_add_servers
+  #args: "kvgroup1, data, {{.NthDataNode 2}}"
+  template: group_move_servers
+  args: "\"Group 1\",kvgroup1,({{.NthDataNode 2}})"
   wait: true
 -
   # create another group
@@ -78,7 +87,7 @@
 -
   # enable autofailover settings
   template: autofailover
-  args: "{{.NthDataNode 2}, 5, full}"
+  args: "{{.NthDataNode 2}}, 5, full"
 -
   # back to default group
   template: group_move_servers

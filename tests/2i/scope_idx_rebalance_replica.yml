@@ -23,7 +23,7 @@ servers: # each server tag represents a cluster
       count: 8
       ram: 70%
       index_ram: 20%
-      index_storage: plasma
+      index_storage: default
       services:
         index: 5
         index_start: 3
