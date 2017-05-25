@@ -34,9 +34,15 @@
   template: group_move_servers
   args: "'Group 1',kvgroup1,({{.NthDataNode 1}}, {{.NthDataNode 2}})"
 -
-  # failover with delta recovery
-  template: failover_and_recover
+  template: failover_node
+  args: "{{.NthDataNode 1}}"
+  wait: true
+-
+  # Delta recovery and add back Node 1
+  template: recover_node
   args: "{{.NthDataNode 1}}, delta"
+-
+  template: rebalance
   wait: true
 -
   template: rebalance_out
