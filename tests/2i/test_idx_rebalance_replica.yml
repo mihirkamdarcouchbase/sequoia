@@ -4,13 +4,13 @@
 ############### data loading ################
 -
   image: sequoiatools/gideon
-  command: "kv --ops {{.Scale 1000}} --create 30 --get 70 --delete 10     --hosts {{.Orchestrator}} --bucket {{.Bucket}}"
+  command: "kv --ops {{.Scale 2000}} --create 30 --get 70 --delete 10     --hosts {{.Orchestrator}} --bucket {{.Bucket}}"
 -
-  command: "kv --ops {{.Scale 500}} --create 60 --get 40 --sizes 64 96   --hosts {{.Orchestrator}} --bucket {{.NthBucket 1}}"
+  command: "kv --ops {{.Scale 1000}} --create 60 --get 40 --sizes 64 96   --hosts {{.Orchestrator}} --bucket {{.NthBucket 1}}"
 -
-  command: "kv --ops {{.Scale 500}} --create 60 --get 40 --sizes 64 96   --hosts {{.Orchestrator}} --bucket {{.NthBucket 2}}"
+  command: "kv --ops {{.Scale 1000}} --create 60 --get 40 --sizes 64 96   --hosts {{.Orchestrator}} --bucket {{.NthBucket 2}}"
 -
-  command: "kv --ops {{.Scale 200}} --create 100 --sizes 1024  --hosts {{.Orchestrator}} --bucket {{.NthBucket 3}}"
+  command: "kv --ops {{.Scale 500}} --create 100 --sizes 1024  --hosts {{.Orchestrator}} --bucket {{.NthBucket 3}}"
 
 
 ###############  create indexes ################
@@ -49,34 +49,27 @@
    command: "-e=http://{{.QueryNodePort}}  -u={{.RestUsername}} -p={{.RestPassword}} -script='build index on `other-3`(rating)"
    wait: true
 
+# ###############  run queries ################
+-
+  image: sequoiatools/curloop
+  command: "n1ql.sh {{.QueryNodePort}} 'select SUM(result) from default where result > 0 limit 50'"
+-
+  command: "n1ql.sh {{.QueryNodePort}} 'select claim from default where result > 0 limit 50'"
+-
+  command: "n1ql.sh {{.QueryNodePort}} 'select SUM(result) from `other-1` where result > 100  limit 50'"
+-
+  command: "n1ql.sh {{.QueryNodePort}} 'select * from `other-1` where result > 100  limit 50'"
+-
+  command: "n1ql.sh {{.QueryNodePort}} 'select SUM(result) from `other-2` where claim like c% limit 50'"
+-
+  command: "n1ql.sh {{.QueryNodePort}} 'select SUM(result) from `other-3` where rating like a% limit 20'"
+-
+  command: "n1ql.sh {{.QueryNodePort}} 'delete from default where result < 300'"
+-
+  command: "n1ql.sh {{.QueryNodePort}} 'delete from default where result > 700'"
+-
+  command: "n1ql.sh {{.QueryNodePort}} 'delete from default where result > 300 and result < 700'"
 
-############### run queries ################
--
-  template: attack_query
-  args: 1200, 10, {{$.QueryNodePort}},
-        select SUM(rating) from default where rating > 0 limit 50
-  duration: 1200
--
-  # load data
-  template: attack_query
-  args: 1200, 10, {{$.QueryNodePort}},
-         select SUM(rating) from `other-1` where rating > 100  limit 50
-  duration: 1200
--
-  template: attack_query
-  args: 1200, 10, {{$.QueryNodePort}},
-        select SUM(rating) from `other-2` where result = SUCCESS limit 50
-  duration: 1200
--
-  template: attack_query
-  args: 1200, 10, {{$.QueryNodePort}},
-        select SUM(rating) from `other-3` where claim like A% limit 20
-  duration: 1200
--
-  template: attack_query
-  args: 1200, 10, {{$.QueryNodePort}},
-        select SUM(rating) from `other-3` where claim like A% limit 20
-  duration: 1200
 
 ############### run creates ################
 -
@@ -209,7 +202,7 @@
    wait: true
 
 -
-   command:  "rebalance -c  {{.Orchestrator}}:{{.RestPort}} --server-remove {{.Nodes | net 7}}:{{.RestPort}} -u  {{.RestUsername}} -p  {{.RestPassword}}"
+   command:  "rebalance -c {{.Orchestrator}}:{{.RestPort}} -u  {{.RestUsername}} -p  {{.RestPassword}}"
    wait: true
 
 ###############  Rebalance-out single node ################
