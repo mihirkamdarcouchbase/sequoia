@@ -32,7 +32,7 @@
   #template: group_add_servers
   #args: "kvgroup1, data, ({{.NthDataNode 1}}, {{.NthDataNode 2}})"
   template: group_move_servers
-  args: "'Group 1',kvgroup1,({{.NthDataNode 1}}, {{.NthDataNode 2}})"
+  args: "'Group 1', kvgroup1, ({{.NthDataNode 1}}, {{.NthDataNode 2}})"
 -
   template: rebalance
   wait: true
@@ -79,7 +79,7 @@
   #template: group_add_servers
   #args: "kvgroup1, data, {{.NthDataNode 2}}"
   template: group_move_servers
-  args: "'Group 1',kvgroup1,({{.NthDataNode 2}})"
+  args: "'Group 1', kvgroup1, {{.NthDataNode 1}}"
   wait: true
 -
   template: rebalance
@@ -92,7 +92,7 @@
 -
   # move to group2 without rebalance
   template: group_move_servers
-  args: "kvgroup1, kvgroup2, {{.NthDataNode 2}}"
+  args: "kvgroup1, kvgroup2, {{.NthDataNode 1}}"
 -
   # remove empty group 1
   template: group_delete
@@ -104,16 +104,16 @@
 -
   # failover and full recover a node
   template: failover_and_recover
-  args: "{{.NthDataNode 2}}, full"
+  args: "{{.NthDataNode 1}}, full"
   wait: true
 -
   # enable autofailover settings
   template: autofailover
-  args: "{{.NthDataNode 2}}, 5, full"
+  args: "{{.NthDataNode 1 | noport}}, 5, full"
 -
   # back to default group
   template: group_move_servers
-  args: "kvgroup2, 'Group 1', {{.NthDataNode 2}}"
+  args: "kvgroup2, 'Group 1', {{.NthDataNode 1}}"
 -
   # remove empty group 2
   template: group_delete
