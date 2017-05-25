@@ -32,7 +32,7 @@
   #template: group_add_servers
   #args: "kvgroup1, data, ({{.NthDataNode 1}}, {{.NthDataNode 2}})"
   template: group_move_servers
-  args: "\"Group 1\",kvgroup1,({{.NthDataNode 1}}, {{.NthDataNode 2}})"
+  args: "'Group 1',kvgroup1,({{.NthDataNode 1}}, {{.NthDataNode 2}})"
 -
   # failover with delta recovery
   template: failover_and_recover
@@ -60,7 +60,7 @@
   #template: group_add_servers
   #args: "kvgroup1, data, {{.NthDataNode 2}}"
   template: group_move_servers
-  args: "\"Group 1\",kvgroup1,({{.NthDataNode 2}})"
+  args: "'Group 1',kvgroup1,({{.NthDataNode 2}})"
   wait: true
 -
   # create another group
