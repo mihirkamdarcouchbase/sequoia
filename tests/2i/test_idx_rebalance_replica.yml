@@ -53,45 +53,45 @@
 ############### run queries ################
 -
   template: attack_query
-  args: 60, 10, {{$.QueryNodePort}},
+  args: 1200, 10, {{$.QueryNodePort}},
         select SUM(rating) from default where rating > 0 limit 50
-  duration: 60
+  duration: 1200
 -
   # load data
   template: attack_query
-  args: 60, 10, {{$.QueryNodePort}},
+  args: 1200, 10, {{$.QueryNodePort}},
          select SUM(rating) from `other-1` where rating > 100  limit 50
-  duration: 60
+  duration: 1200
 -
   template: attack_query
-  args: 60, 10, {{$.QueryNodePort}},
+  args: 1200, 10, {{$.QueryNodePort}},
         select SUM(rating) from `other-2` where result = SUCCESS limit 50
-  duration: 60
+  duration: 1200
 -
   template: attack_query
-  args: 60, 10, {{$.QueryNodePort}},
+  args: 1200, 10, {{$.QueryNodePort}},
         select SUM(rating) from `other-3` where claim like A% limit 20
-  duration: 60
+  duration: 1200
 -
   template: attack_query
-  args: 60, 10, {{$.QueryNodePort}},
+  args: 1200, 10, {{$.QueryNodePort}},
         select SUM(rating) from `other-3` where claim like A% limit 20
-  duration: 60
+  duration: 1200
 
 ############### run creates ################
 -
   image: sequoiatools/gideon
   command: "kv --ops {{.Scale 1000}} --create 100     --hosts {{.Orchestrator}} --bucket {{.Bucket}}"
-  duration: 60
+  duration: 1200
 -
   command: "kv --ops {{.Scale 1000}} --create 100  --sizes 64 96   --hosts {{.Orchestrator}} --bucket {{.NthBucket 1}}"
-  duration: 60
+  duration: 1200
 -
   command: "kv --ops {{.Scale 1000}} --create 100  --sizes 64 96   --hosts {{.Orchestrator}} --bucket {{.NthBucket 2}}"
-  duration: 60
+  duration: 1200
 -
   command: "kv --ops {{.Scale 1000}} --create 100  --sizes 512  --hosts {{.Orchestrator}} --bucket {{.NthBucket 3}}"
-  duration: 60
+  duration: 1200
 
 
 ###############  Rebalance-in single node ################
@@ -185,12 +185,17 @@
        -u  {{.RestUsername}} -p  {{.RestPassword}}"
    wait: true
 -
-   command: "server-add -c {{.Orchestrator}}:{{.RestPort}}
-       --server-add  {{.Nodes | net 6}}:{{.RestPort}}
-       --services index
-       -u  {{.RestUsername}} -p  {{.RestPassword}}
-       --server-add-username {{.RestUsername}} --server-add-password  {{.RestPassword}}"
+   command: "server-readd -c {{.Orchestrator}}:{{.RestPort}}
+            --server-add {{.Nodes | net 6}}:{{.RestPort}}
+            -u  {{.RestUsername}} -p  {{.RestPassword}}"
    wait: true
+-
+   command: "recovery -c {{.Orchestrator}}:{{.RestPort}}
+       --server-recovery {{.Nodes | net 6}}:{{.RestPort}}
+       --recovery-type full
+       -u  {{.RestUsername}} -p  {{.RestPassword}}"
+   wait: true
+
 -
    command:  "rebalance -c {{.Orchestrator}}:{{.RestPort}} -u  {{.RestUsername}} -p  {{.RestPassword}}"
    wait: true
@@ -213,7 +218,7 @@
    command:  "rebalance -c  {{.Orchestrator}}:{{.RestPort}} --server-remove {{.Nodes | net 6}}:{{.RestPort}} -u  {{.RestUsername}} -p  {{.RestPassword}}"
    wait: true
 
-###############  Drop all Indexes ################
+###############  Drop some Indexes ################
 -
    image: sequoiatools/cbq
    command: "-e=http://{{.QueryNodePort}}  -u={{.RestUsername}} -p={{.RestPassword}} -script='drop index `default`'"
@@ -230,7 +235,7 @@
 -
    command: "-e=http://{{.QueryNodePort}}  -u={{.RestUsername}} -p={{.RestPassword}} -script='drop index `other-3`.o3_results'"
    wait: true
-###############  Recreate all Indexes ################
+###############  Recreate some Indexes ################
 -
    image: sequoiatools/cbq
    command: "-e=http://{{.QueryNodePort}}  -u={{.RestUsername}} -p={{.RestPassword}} -script='create index default_claims on `default`(claim) using GSI'"
