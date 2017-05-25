@@ -151,7 +151,7 @@
 ###############  Rebalance-out two nodes ################
 -
    image: sequoiatools/couchbase-cli
-   command:  "rebalance -c  {{.Orchestrator}}:{{.RestPort}} --server-remove {{.Nodes | net 6}}:{{.RestPort}} --server-remove {{.Nodes | net 7}}:{{.RestPort}} -u  {{.RestUsername}} -p  {{.RestPassword}}"
+   command:  "rebalance -c  {{.Orchestrator}}:{{.RestPort}} --server-remove {{.Nodes | net 6}}:{{.RestPort}},{{.Nodes | net 7}}:{{.RestPort}} -u  {{.RestUsername}} -p  {{.RestPassword}}"
    wait: true
 
 ###############  Swap Rebalance two nodes ################
@@ -174,7 +174,7 @@
 
 -
    image: sequoiatools/couchbase-cli
-   command:  "rebalance -c  {{.Orchestrator}}:{{.RestPort}} --server-remove {{.Nodes | net 4}}:{{.RestPort}} {{.Nodes | net 5}}:{{.RestPort}} -u  {{.RestUsername}} -p  {{.RestPassword}}"
+   command:  "rebalance -c  {{.Orchestrator}}:{{.RestPort}} --server-remove {{.Nodes | net 4}}:{{.RestPort}},{{.Nodes | net 5}}:{{.RestPort}} -u  {{.RestUsername}} -p  {{.RestPassword}}"
    wait: true
 
 ###############  Failover and addback ################
